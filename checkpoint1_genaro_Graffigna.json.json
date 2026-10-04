@@ -1,0 +1,180 @@
+{
+  "name": "IA AVANZADO",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bc68a047-0070-4bab-b188-b3045b0fbf7a",
+      "name": "When chat message received",
+      "webhookId": "a077c653-6248-4c4d-a983-c1cc7647ddf6"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "ROL\n\nSos el asistente virtual de iPhone Bros, emprendimiento dedicado a la venta de iPhones usados.\n\n\nÁMBITO\n\nTu función es atender consultas comerciales relacionadas con modelos, capacidad, color, batería, estado, precio y disponibilidad de equipos.\n\n\nOBJETIVO\n\nAyudar al cliente a encontrar un iPhone disponible que se ajuste a su consulta.\n\nCuando necesites información actualizada sobre stock, precio, modelo, capacidad, color, batería o estado de un equipo, utilizá la herramienta de Google Sheets.\n\n\nREGLAS\n\n1. No inventes modelos, precios, stock ni características.\n2. Cuando la información dependa del stock actual, consultá Google Sheets.\n3. Respondé de forma clara, breve y profesional.\n4. No modifiques el stock.\n5. No ejecutes acciones que no estén relacionadas con la atención comercial de iPhone Bros.\n6. Si no encontrás la información solicitada, indicá que no está disponible.\n7. No inventes resultados de las herramientas.\n\n\nESCALAMIENTO\n\nSi el cliente solicita una acción que excede tus funciones, no la ejecutes y solicitá intervención de un responsable de iPhone Bros.",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e427ebbb-7cc7-4848-90e8-af948aea506f",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Esta herramienta permite consultar el inventario actual de iPhone Bros.\n\nDebe utilizarse cuando el cliente pregunte por la disponibilidad de un iPhone, modelo, capacidad, color, precio, salud de batería o estado del equipo.\n\nUtilizá esta herramienta antes de responder cuando la información solicitada dependa del stock actual.\n\nTambién debe utilizarse cuando el cliente solicite comparar dos o más equipos disponibles.\n\nLos datos obtenidos representan la información registrada en el inventario de iPhone Bros.\n\nNo inventes información que no aparezca en los resultados de esta herramienta.\n\nSi un equipo figura como VENDIDO, informá que actualmente no se encuentra disponible.\n\nSi el producto solicitado no aparece en los resultados, informá que no se encuentra disponible en el stock consultado.\n\nNo utilices esta herramienta para preguntas generales que no necesiten información del inventario.",
+        "documentId": {
+          "__rl": true,
+          "value": "1tGKHVKwFfPK2IbNIPEMGVQivI6eHPefO3hDXDLqFVpg",
+          "mode": "list",
+          "cachedResultName": "Stock iPhone Bros",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tGKHVKwFfPK2IbNIPEMGVQivI6eHPefO3hDXDLqFVpg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tGKHVKwFfPK2IbNIPEMGVQivI6eHPefO3hDXDLqFVpg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        208
+      ],
+      "id": "6d360a0a-347e-44a8-aeab-dc06bdc13111",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SrKiqXxWgfx5FLpE",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        208
+      ],
+      "id": "4c3ee17a-781d-4fe8-bc27-06fdd22bf672",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "5bfvqElMSHeQoOxx",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "genarograffigna@gmail.com",
+        "subject": "Reporte automático - iPhone Bros",
+        "message": "=REPORTE DE SUPERVISIÓN - IPHONE BROS  Resultado generado por el AI Agent:  {{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "75f5f55a-4977-4963-a968-277535651213",
+      "name": "Send a message",
+      "webhookId": "f2756fa7-cf35-4045-93eb-9711e7b63ef6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WnP0e3J55cEY8Ctz",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "27a3db2e-7f9b-406d-8510-153e5a26070d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c2b07bf0edd545d48e7be97ad5b4924d813dfe13729b1414b4617272940e9169"
+  },
+  "nodeGroups": [],
+  "id": "3vwOfZxBNcLkHWLE",
+  "tags": []
+}
